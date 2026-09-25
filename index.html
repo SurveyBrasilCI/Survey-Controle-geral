@@ -240,27 +240,6 @@ body{font-family:var(--font-sans);background:var(--bg-tertiary);color:var(--text
 .pend-dot.baixa{color:var(--text-tertiary);}
 .pend-none{font-size:11px;color:var(--text-tertiary);padding-top:6px;}
 
-/* FLEET MATRIX */
-.matrix-wrap{overflow-x:auto;}
-.matrix-table{border-collapse:collapse;font-size:11px;font-family:var(--font-mono);}
-.matrix-table th{background:var(--bg-secondary);border:1px solid var(--border);padding:5px 10px;font-size:10px;font-weight:500;color:var(--text-secondary);text-align:center;white-space:nowrap;}
-.matrix-table th.lh{text-align:left;}
-.matrix-table td{border:1px solid var(--border);padding:4px 6px;vertical-align:middle;}
-.matrix-table td.vnc{font-weight:600;white-space:nowrap;background:var(--bg-secondary);font-size:11px;cursor:pointer;color:var(--text-primary);text-align:left;padding-left:10px;}
-.matrix-table td.vnc:hover{color:var(--accent);}
-.matrix-table td.vnc a{color:inherit;text-decoration:none;}
-.matrix-table td.vnc a:hover{text-decoration:underline;}
-.matrix-table td.rc{font-size:10px;color:var(--text-tertiary);background:var(--bg-secondary);white-space:nowrap;text-align:left;}
-.split-cell{display:flex;align-items:center;justify-content:center;height:24px;}
-.split-half{flex:1;display:flex;align-items:center;justify-content:center;}
-.split-div{width:1px;height:14px;background:var(--border);flex-shrink:0;}
-.single-cell{display:flex;align-items:center;justify-content:center;height:24px;}
-.m-dot{width:8px;height:8px;border-radius:50%;}
-.m-ok{background:var(--green);}.m-warn{background:var(--amber);}.m-crit{background:var(--red);}.m-absent{background:var(--border);opacity:.5;}.m-spare{background:var(--blue);}
-.matrix-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);}
-.legend-note{font-size:10px;color:var(--text-tertiary);}
-
 /* VESSEL DETAIL */
 .vd-header{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
 .vd-photo{width:260px;height:112px;flex:0 0 260px;border-radius:var(--radius-md);overflow:hidden;position:relative;background:linear-gradient(135deg,var(--bg-secondary),var(--bg-tertiary));border:1px solid var(--border-secondary);}
@@ -517,7 +496,6 @@ body{font-family:var(--font-sans);background:var(--bg-tertiary);color:var(--text
   .systems-head{align-items:flex-start;gap:4px;flex-direction:column;}
   .equip-row{grid-template-columns:repeat(2,minmax(0,1fr));}
   .equip-pill{min-width:0;}
-  .matrix-legend{gap:10px;}
   .vd-photo{width:100%;flex-basis:100%;height:150px;}
   .vd-header.has-photo{min-height:270px;align-items:flex-end;}
   .vd-header.has-photo .vd-left,.vd-header.has-photo .vd-right{padding:14px 16px;}
@@ -608,7 +586,6 @@ body{font-family:var(--font-sans);background:var(--bg-tertiary);color:var(--text
 
 <nav class="nav">
   <div class="nav-item active" onclick="setPage('dashboard')" id="nav-dashboard"><i class="ti ti-layout-dashboard"></i> Visão Geral</div>
-  <div class="nav-item" onclick="setPage('matrix')" id="nav-matrix"><i class="ti ti-table"></i> Fleet Matrix</div>
   <div class="nav-item" onclick="setPage('mapa')" id="nav-mapa"><i class="ti ti-map-2"></i> Mapa da Frota</div>
   <div class="nav-item" onclick="setPage('cert')" id="nav-cert"><i class="ti ti-certificate"></i> Certificações</div>
 </nav>
@@ -643,16 +620,6 @@ body{font-family:var(--font-sans);background:var(--bg-tertiary);color:var(--text
     </div>
   </div>
   <div id="page-vessel" class="page"><div id="vessel-detail"></div></div>
-  <div id="page-matrix" class="page">
-    <div class="matrix-legend">
-      <span class="legend-item"><span class="m-dot m-ok"></span>Operacional</span>
-      <span class="legend-item"><span class="m-dot m-warn"></span>Atenção/Pendência</span>
-      <span class="legend-item"><span class="m-dot m-crit"></span>Inoperante/Vencido</span>
-      <span class="legend-item"><span class="m-dot m-absent"></span>Sem registro</span>
-      <span class="legend-note">Fonte: aba ControleEquipamentos</span>
-    </div>
-    <div class="matrix-wrap"><table class="matrix-table" id="matrix-table"></table></div>
-  </div>
   <div id="page-mapa" class="page">
     <div class="page-title"><i class="ti ti-map-2"></i>Mapa da Frota</div>
     <div class="page-subtitle">Visualização das posições cadastradas na aba Posicoes da planilha. Use o filtro para mostrar todas as embarcações ou apenas uma seleção específica.</div>
@@ -807,7 +774,6 @@ const ASSET_VERSION='20260629-v8';
 const CRIT_EQ=['SprintNav','Mini-Beacon','SVX','Digiquartz','Ranger','HPT'];
 const ROV_EQ=['SprintNav','Mini-Beacon','Digiquartz','SVX','DVL'];
 const SYS_EQ=['Ranger','HPT','Navipac PC','Ranger PC','NAS','DVR'];
-const SPLIT_EQ=new Set(['SprintNav','Mini-Beacon','Digiquartz','SVX','DVL']);
 const PRIO={"Crítica":0,Alta:1,"Média":2,Baixa:3};
 const FLEET_NAMES=new Set(FLEET.map(f=>f.embarcacao));
 
@@ -1201,75 +1167,6 @@ function renderSummary(data,vessels){
     <div class="summary-card"><div class="summary-label">Atenção</div><div class="summary-value warn">${warn}</div></div>
     <div class="summary-card"><div class="summary-label">Inoperantes</div><div class="summary-value danger">${inop}</div></div>
     <div class="summary-card"><div class="summary-label">Pendências</div><div class="summary-value warn">${pab}</div></div>`;
-}
-function mdot(st){const c={ok:'m-ok',warn:'m-warn',crit:'m-crit',spare:'m-spare',absent:'m-absent'}[st]||'m-absent';return`<span class="m-dot ${c}"></span>`;}
-function controleMatrixTitle(rows){
-  if(!rows.length)return'Sem registro na ControleEquipamentos';
-  const venc=rows.filter(r=>tipoControle(r)==='vencimento').length;
-  const pend=rows.filter(r=>tipoControle(r)==='pendencia').length;
-  const obs=rows.filter(r=>tipoControle(r)==='observacao').length;
-  const inop=rows.some(r=>normText(r.statusEquipamento)==='inoperante');
-  const next=controleNextDue(rows);
-  const parts=[
-    `${rows.length} registros`,
-    `${venc} vencimentos`,
-    `${pend} pendências`,
-    `${obs} observações`
-  ];
-  if(inop)parts.push('equipamento inoperante');
-  if(next)parts.push(`próximo: ${fmt(next.vencimento)}`);
-  return parts.join(' | ');
-}
-function renderMatrix(data){
-  if(hasControleEquipamentos(data)){
-    const present=[...new Set(data.controleEquipamentos.map(r=>canonicalControleGroup(r.grupo)||r.grupo).filter(Boolean))];
-    const preferred=CONTROLE_GROUP_ORDER.filter(eq=>present.includes(eq));
-    const extra=present.filter(eq=>!preferred.includes(eq)).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-    const eqs=[...preferred,...extra];
-    let h='<thead><tr><th class="lh">Embarcação</th><th class="lh">ROVs</th>';
-    eqs.forEach(eq=>{h+=`<th>${escapeHtml(CONTROLE_GROUP_LABELS[eq]||eq)}</th>`;});
-    h+='</tr></thead><tbody>';
-    FLEET.forEach(f=>{
-      const rows=controleRowsByVessel(data,f.embarcacao);
-      const st=vStFromGroups(controleGroupsForCard(rows));
-      const sc={ok:'#22c55e',warn:'#f59e0b',crit:'#ef4444'}[st]||'#64748b';
-      h+=`<tr><td class="vnc" style="border-left:3px solid ${sc};">${vesselLink(f.embarcacao,f.embarcacao)}</td>`;
-      h+=`<td class="rc">${f.rovs.join(' / ')}</td>`;
-      eqs.forEach(eq=>{
-        const groupRows=rows.filter(r=>r.grupo===eq);
-        const st=groupRows.length?groupControleStatus(groupRows):'absent';
-        h+=`<td title="${escapeHtml(controleMatrixTitle(groupRows))}"><div class="single-cell">${mdot(st)}</div></td>`;
-      });
-      h+='</tr>';
-    });
-    h+='</tbody>';
-    document.getElementById('matrix-table').innerHTML=h;
-    return;
-  }
-  const eqs=[...new Set(data.inventario.map(i=>i.equipamento))].sort();
-  let h='<thead><tr><th class="lh">Embarcação</th><th class="lh">ROVs</th>';
-  eqs.forEach(eq=>{h+=`<th>${eq}</th>`;});
-  h+='</tr></thead><tbody>';
-  FLEET.forEach(f=>{
-    const its=data.inventario.filter(i=>i.embarcacao===f.embarcacao);
-    const vs=vSt(its);
-    const sc={ok:'#22c55e',warn:'#f59e0b',crit:'#ef4444'}[vs];
-    h+=`<tr><td class="vnc" style="border-left:3px solid ${sc};">${vesselLink(f.embarcacao,f.embarcacao)}</td>`;
-    h+=`<td class="rc">${f.rovs.join(' / ')}</td>`;
-    eqs.forEach(eq=>{
-      if(SPLIT_EQ.has(eq)&&f.rovs.length>1){
-        const s1=its.find(i=>i.rov===f.rovs[0]&&i.equipamento===eq&&i.status!=='Spare');
-        const s2=its.find(i=>i.rov===f.rovs[1]&&i.equipamento===eq&&i.status!=='Spare');
-        h+=`<td><div class="split-cell"><div class="split-half">${mdot(s1?eSt(s1):'absent')}</div><div class="split-div"></div><div class="split-half">${mdot(s2?eSt(s2):'absent')}</div></div></td>`;
-      } else {
-        const f2=its.find(i=>i.equipamento===eq&&i.status!=='Spare');
-        h+=`<td><div class="single-cell">${mdot(f2?eSt(f2):'absent')}</div></td>`;
-      }
-    });
-    h+='</tr>';
-  });
-  h+='</tbody>';
-  document.getElementById('matrix-table').innerHTML=h;
 }
 function eCard(item){
   const st=eSt(item);
@@ -2068,7 +1965,6 @@ async function loadData(force=false,silent=false){
     initVesselFilter();
     initMapFilter();
     renderDashboardView();
-    renderMatrix(data);
     renderMapPage();
     initCertFilters(data);
     openVesselFromUrl(true);
